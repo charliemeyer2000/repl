@@ -357,13 +357,10 @@ def runProofStep (s : ProofStep) : M IO (ProofStepResponse ⊕ Error) := do
   | some proofState =>
     try
       let proofState' ← proofState.runString s.tactic
-      -- When backtracking, truncate the proof states array to maintain linear progression
-      -- The new state will be assigned the ID right after the state we're backtracking to
-      modify fun state => 
-        { state with proofStates := state.proofStates.shrink (s.proofState + 1) }
       return .inl (← createProofStepReponse proofState' proofState)
     catch ex =>
       return .inr ⟨"Lean error:\n" ++ ex.toString⟩
+
 end REPL
 
 open REPL
